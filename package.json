@@ -1,0 +1,12 @@
+{
+  "name": "vanilla-search-lib",
+  "version": "1.0.0",
+  "description": "A vanilla JavaScript based purely logical library for search purposes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Custom"
+}
