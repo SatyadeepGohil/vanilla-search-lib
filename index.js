@@ -1,6 +1,6 @@
 class Search {
     constructor(data) {
-        this.originalData = data || [];
+        this.originalData = Array.isArray(data) ? data : (data ? [data] : []);
     }
 
     search(query, options = {}) {
@@ -18,26 +18,19 @@ class Search {
                     );
                 }
                 break;
+            case 'sub-string':
+                for (let i = 0; i < this.originalData.length; i++) {
+                    if (typeof this.originalData[i] !== 'string') {
+                        throw new Error('In the SubString Mode Only String Data Type is allowed.')
+                    }
+                    return this.originalData.filter(item => item.includes(query));
+                }
             default:
                 throw new Error('No modes matched with existing ones.');
         }
     }
 }
 
+export default Search;
 
-const searchInstance = new Search(['apple', 'banana', 'Banana', 'Apple', 'orange','Orange', 'Orang3']);
-const search2 = new Search({name: 'John', age: 20});
-
-console.log(searchInstance.search('banana'));
-
-console.log(searchInstance.search('Apple', {caseSensitive: true}));
-
-/* console.log(searchInstance.search('apple', { mode: 'not-exact'})); */
-
-console.log(searchInstance.search('orange'));
-
-console.log(searchInstance.search('Orang3', { caseSensitive: true }))
-
-console.log(search2.search({age: 20}))
-
-console.log(performance.now())
+console.log(new Search('Hi, How are you?').search('Hi', { mode: 'sub-string'}));
