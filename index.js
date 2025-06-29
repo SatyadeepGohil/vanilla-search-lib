@@ -3,7 +3,7 @@ class Seekr {
         this.originalData = data;
     }
 
-    search(query,property, options = {}) {
+    search(query, property, options = {}) {
         const {mode = 'exact', caseSensitive = false } = options;
 
         switch(mode){
@@ -47,6 +47,10 @@ class Seekr {
 
 export default Seekr;
 
+/* import { performance } from "perf_hooks";
+
+const t1 = performance.now();
+
 const objectSearch = [{id: 1, name: 'john'}, {id: 2, name: 'jessica'}]
 const arraySearch = ['Apple', 'apple', 'banana', 'Banana'];
 const subStringSearch = ['hi, how are you?'];
@@ -56,3 +60,7 @@ console.log( new Seekr(objectSearch).search('jessica', 'name', { mode: 'exact', 
 console.log( new Seekr(arraySearch).search('Apple', null, { mode: 'exact', caseSensitive: true}));
 console.log( new Seekr(arraySearch).search('Banana', null, { mode: 'exact'}));
 console.log( new Seekr(subStringSearch).search('hi', null, { mode: 'sub-string'}));
+
+const t2 = performance.now();
+const time = (t2 - t1).toFixed(2);
+console.log(time + 'ms') */
