@@ -1,6 +1,6 @@
 {
   "name": "@satyadeep-gohil/seekr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A fast, dependency-free JavaScript search utility for arrays, objects, strings, and more.",
   "main": "index.js",
   "type": "module",
