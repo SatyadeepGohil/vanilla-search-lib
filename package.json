@@ -1,5 +1,5 @@
 {
-  "name": "seekr",
+  "name": "@satyadeep-gohil/seekr",
   "version": "1.0.0",
   "description": "A fast, dependency-free JavaScript search utility for arrays, objects, strings, and more.",
   "main": "index.js",
