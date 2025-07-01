@@ -1,13 +1,44 @@
 {
-  "name": "vanilla-search-lib",
+  "name": "seekr",
   "version": "1.0.0",
-  "description": "A vanilla JavaScript based purely logical library for search purposes.",
+  "description": "A fast, dependency-free JavaScript search utility for arrays, objects, strings, and more.",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "exports": {
+    ".": "./index.js"
   },
-  "keywords": [],
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE",
+    "test.js"
+  ],
+  "scripts": {
+    "test": "echo \"No test suite specified.\" && exit 0"
+  },
+  "keywords": [
+    "search",
+    "filter",
+    "array",
+    "object",
+    "javascript",
+    "vanilla",
+    "deep search",
+    "string search",
+    "substring",
+    "exact match",
+    "data filter",
+    "utility",
+    "library"
+  ],
   "author": "Satyadeep Gohil",
-  "license": "Custom"
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://github.com/satyadeepgohil/Seekr#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satyadeepgohil/Seekr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/satyadeepgohil/Seekr/issues"
+  }
 }

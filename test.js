@@ -1,4 +1,4 @@
-import Seekr from './index.js';
+import Seekr from "./index.js";
 import { performance } from "perf_hooks";
 
 const gc = typeof global.gc === 'function' ? global.gc : undefined;
@@ -105,7 +105,7 @@ class PerformanceTester {
 
     // Run multiple iterations and calculate statistics
     async runTestSuite(testFn, testName) {
-        console.log(`\\n🧪 Running ${testName}...`);
+        console.log(`\n🧪 Running ${testName}...`);
         
         // Warm-up runs
         console.log(`  Warming up (${this.warmupRuns} runs)...`);
@@ -167,31 +167,132 @@ class PerformanceTester {
         return Math.sqrt(variance);
     }
 
-    // Format and display results
-    displayResults(stats) {
-        console.log(`\\n📊 Results for ${stats.name}:`);
-        console.log(`  ⏱️  Duration (ms):`);
-        console.log(`     Min: ${stats.duration.min.toFixed(2)}`);
-        console.log(`     Max: ${stats.duration.max.toFixed(2)}`);
-        console.log(`     Mean: ${stats.duration.mean.toFixed(2)}`);
-        console.log(`     Median: ${stats.duration.median.toFixed(2)}`);
-        console.log(`     95th percentile: ${stats.duration.p95.toFixed(2)}`);
-        console.log(`     99th percentile: ${stats.duration.p99.toFixed(2)}`);
-        console.log(`     Std Dev: ${stats.duration.stdDev.toFixed(2)}`);
-        console.log(`  🎯 Results: ${stats.results.count} items found`);
-        console.log(`  🧠 Memory: ${(stats.memory.avgHeapDelta / 1024 / 1024).toFixed(2)} MB avg heap change`);
+    // Create table header
+    createTableHeader() {
+        const header = [
+            'Test Name'.padEnd(45),
+            'Mean (ms)'.padStart(10),
+            'Median (ms)'.padStart(12),
+            'Min (ms)'.padStart(10),
+            'Max (ms)'.padStart(10),
+            'P95 (ms)'.padStart(10),
+            'P99 (ms)'.padStart(10),
+            'Std Dev'.padStart(10),
+            'Results'.padStart(10),
+            'Memory (MB)'.padStart(12),
+            'Rating'.padEnd(20)
+        ];
         
-        // Performance rating
+        const separator = header.map(col => '─'.repeat(col.length));
+        
+        return [
+            '┌' + separator.map(s => s.replace(/─/g, '─')).join('┬') + '┐',
+            '│' + header.join('│') + '│',
+            '├' + separator.map(s => s.replace(/─/g, '─')).join('┼') + '┤'
+        ];
+    }
+
+    // Create table row
+    createTableRow(stats) {
         const rating = this.getPerformanceRating(stats.duration.mean);
-        console.log(`  📈 Rating: ${rating}`);
+        
+        const row = [
+            this.truncateString(stats.name, 45).padEnd(45),
+            stats.duration.mean.toFixed(2).padStart(10),
+            stats.duration.median.toFixed(2).padStart(12),
+            stats.duration.min.toFixed(2).padStart(10),
+            stats.duration.max.toFixed(2).padStart(10),
+            stats.duration.p95.toFixed(2).padStart(10),
+            stats.duration.p99.toFixed(2).padStart(10),
+            stats.duration.stdDev.toFixed(2).padStart(10),
+            stats.results.count.toString().padStart(10),
+            (stats.memory.avgHeapDelta / 1024 / 1024).toFixed(2).padStart(12),
+            rating.padEnd(20)
+        ];
+        
+        return '│' + row.join('│') + '│';
+    }
+
+    // Create table footer
+    createTableFooter() {
+        const separator = [
+            'Test Name'.padEnd(45),
+            'Mean (ms)'.padStart(10),
+            'Median (ms)'.padStart(12),
+            'Min (ms)'.padStart(10),
+            'Max (ms)'.padStart(10),
+            'P95 (ms)'.padStart(10),
+            'P99 (ms)'.padStart(10),
+            'Std Dev'.padStart(10),
+            'Results'.padStart(10),
+            'Memory (MB)'.padStart(12),
+            'Rating'.padEnd(20)
+        ].map(col => '─'.repeat(col.length));
+        
+        return '└' + separator.map(s => s.replace(/─/g, '─')).join('┴') + '┘';
+    }
+
+    // Truncate string to fit column width
+    truncateString(str, maxLength) {
+        if (str.length <= maxLength) return str;
+        return str.substring(0, maxLength - 3) + '...';
+    }
+
+    // Display results in table format
+    displayResultsTable(allResults) {
+        console.log('\n\n📊 PERFORMANCE TEST RESULTS');
+        console.log('═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+        
+        // Create and display table
+        const headerLines = this.createTableHeader();
+        headerLines.forEach(line => console.log(line));
+        
+        // Display each result row
+        allResults.forEach(stats => {
+            console.log(this.createTableRow(stats));
+        });
+        
+        // Display footer
+        console.log(this.createTableFooter());
+        
+        // Summary statistics
+        console.log('\n📈 SUMMARY STATISTICS');
+        console.log('─────────────────────');
+        
+        const overallMean = allResults.reduce((sum, stat) => sum + stat.duration.mean, 0) / allResults.length;
+        const fastest = allResults.reduce((min, stat) => stat.duration.mean < min.duration.mean ? stat : min);
+        const slowest = allResults.reduce((max, stat) => stat.duration.mean > max.duration.mean ? stat : max);
+        const totalResults = allResults.reduce((sum, stat) => sum + stat.results.count, 0);
+        const avgMemory = allResults.reduce((sum, stat) => sum + stat.memory.avgHeapDelta, 0) / allResults.length / 1024 / 1024;
+        
+        console.log(`🎯 Overall Average Performance: ${overallMean.toFixed(2)}ms`);
+        console.log(`🚀 Fastest Test: ${this.truncateString(fastest.name, 40)} (${fastest.duration.mean.toFixed(2)}ms)`);
+        console.log(`🐌 Slowest Test: ${this.truncateString(slowest.name, 40)} (${slowest.duration.mean.toFixed(2)}ms)`);
+        console.log(`📊 Total Results Found: ${totalResults.toLocaleString()}`);
+        console.log(`🧠 Average Memory Usage: ${avgMemory.toFixed(2)}MB`);
+        
+        // Performance distribution
+        const excellent = allResults.filter(r => r.duration.mean < 10).length;
+        const good = allResults.filter(r => r.duration.mean >= 10 && r.duration.mean < 50).length;
+        const acceptable = allResults.filter(r => r.duration.mean >= 50 && r.duration.mean < 200).length;
+        const slow = allResults.filter(r => r.duration.mean >= 200 && r.duration.mean < 500).length;
+        const verySlow = allResults.filter(r => r.duration.mean >= 500).length;
+        
+        console.log('\n🏆 PERFORMANCE DISTRIBUTION');
+        console.log('───────────────────────────');
+        console.log(`🚀 Excellent (<10ms):     ${excellent} tests`);
+        console.log(`✅ Good (10-50ms):        ${good} tests`);
+        console.log(`⚠️  Acceptable (50-200ms): ${acceptable} tests`);
+        console.log(`🐌 Slow (200-500ms):      ${slow} tests`);
+        console.log(`🚨 Very Slow (>500ms):    ${verySlow} tests`);
     }
 
     getPerformanceRating(meanTime) {
-        if (meanTime < 10) return "🚀 Excellent (<10ms)";
-        if (meanTime < 50) return "✅ Good (<50ms)";
-        if (meanTime < 200) return "⚠️  Acceptable (<200ms)";
-        if (meanTime < 500) return "🐌 Slow (<500ms)";
-        return "🚨 Very Slow (>500ms)";
+        if (meanTime < 10) return "🚀 Excellent";
+        if (meanTime < 50) return "✅ Good";
+        if (meanTime < 200) return "⚠️  Acceptable";
+        if (meanTime < 500) return "🐌 Slow";
+        return "🚨 Very Slow";
     }
 
     // Run all performance tests
@@ -256,22 +357,8 @@ class PerformanceTester {
             return searcher.search('John', 'user.profile.name', { mode: 'exact' });
         }, 'Nested Object - Deep Property Search'));
 
-        // Display all results
-        console.log('\\n\\n📈 COMPREHENSIVE TEST SUMMARY');
-        console.log('===============================');
-        
-        allResults.forEach(stats => this.displayResults(stats));
-
-        // Overall performance summary
-        const overallMean = allResults.reduce((sum, stat) => sum + stat.duration.mean, 0) / allResults.length;
-        console.log(`\\n🎯 Overall Average Performance: ${overallMean.toFixed(2)}ms`);
-        
-        // Identify fastest and slowest tests
-        const fastest = allResults.reduce((min, stat) => stat.duration.mean < min.duration.mean ? stat : min);
-        const slowest = allResults.reduce((max, stat) => stat.duration.mean > max.duration.mean ? stat : max);
-        
-        console.log(`🚀 Fastest Test: ${fastest.name} (${fastest.duration.mean.toFixed(2)}ms)`);
-        console.log(`🐌 Slowest Test: ${slowest.name} (${slowest.duration.mean.toFixed(2)}ms)`);
+        // Display results in table format
+        this.displayResultsTable(allResults);
 
         return allResults;
     }
@@ -283,17 +370,12 @@ async function main() {
     
     try {
         await tester.runAllTests();
-        console.log('\\n✅ All performance tests completed successfully!');
+        console.log('\n✅ All performance tests completed successfully!');
     } catch (error) {
         console.error('❌ Test suite failed:', error);
         process.exit(1);
     }
 }
-
-// Check if running directly
-/* if (import.meta.url === `file://${process.argv[1]}`) {
-    main();
-} */
 
 main();
 
