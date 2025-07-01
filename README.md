@@ -19,7 +19,7 @@ Built for performance, flexibility, and extensibility — with support for deep 
 ## 📦 Installation
 
 ```bash
-npm install Seekr
+npm i @satyadeep-gohil/seekr
 ```
 
 ---
